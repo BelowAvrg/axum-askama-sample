@@ -4,6 +4,7 @@ use axum::{
 };
 use thiserror::Error;
 use validator::ValidationErrors;
+use axum::extract::rejection::FormRejection;
 
 #[derive(Error, Debug)]
 pub enum AppError {
@@ -11,6 +12,8 @@ pub enum AppError {
     Sqlx(#[from] sqlx::Error),
     #[error("Validation error: {0}")]
     Validation(#[from] ValidationErrors),
+    #[error("Form rejection error: {0}")]
+    FormRejection(#[from] FormRejection),
 }
 
 impl AppError {
@@ -18,6 +21,7 @@ impl AppError {
         match self {
             AppError::Sqlx(_) => StatusCode::INTERNAL_SERVER_ERROR,
             AppError::Validation(_) => StatusCode::BAD_REQUEST,
+            AppError::FormRejection(_) => StatusCode::BAD_REQUEST,
         }
     }
 }
