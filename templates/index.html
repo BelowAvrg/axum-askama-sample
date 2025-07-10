@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axum Asmama Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="bg-gray-200">
+    <div class="container mx-auto mt-10 max-w-lg">
+        <div class="bg-white rounded-lg shadow-xl p-8">
+            <h1 class="text-4xl font-bold text-center text-gray-800 mb-2">Todo</h1>
+            <p class="text-center text-gray-500 mb-8">A demo app using Axum, and Askama.</p>
+            
+            <div x-data="{ newTodo: '' }">
+                <form action="/" method="post" @submit.prevent="
+                    if (newTodo.trim() === '') return;
+                    fetch('/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: new URLSearchParams({ description: newTodo })
+                    }).then(() => { location.reload(); });
+                    newTodo = '';
+                " class="flex gap-4">
+                    <input type="text" x-model="newTodo" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Add a new todo...">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition duration-300">Add</button>
+                </form>
+            </div>
+
+            <ul class="mt-8 space-y-4">
+                {% for todo in todos %}
+                <li x-data="{ editing: false, newDescription: '{{ todo.description }}' }" x-init="$watch('editing', val => { if (val) $nextTick(() => $refs.editInput.focus()) })" class="flex items-center justify-between bg-gray-100 p-4 rounded-lg shadow-sm">
+                    <div class="flex items-center flex-grow">
+                        <form action="/toggle/{{ todo.id }}" method="post" class="m-0 mr-4">
+                            <input type="checkbox" {% if todo.done %} checked {% endif %} onchange="this.form.submit()" class="h-6 w-6 rounded border-gray-300 text-blue-500 focus:ring-blue-500">
+                        </form>
+                        
+                        <div x-show="!editing" class="flex-grow" @click="editing = true">
+                            <span class="text-lg cursor-pointer {% if todo.done %} line-through text-gray-500 {% else %} text-gray-800 {% endif %}">
+                                {{ todo.description }}
+                            </span>
+                        </div>
+
+                        <div x-show="editing" class="flex-grow" x-cloak>
+                            <form action="/rename/{{ todo.id }}" method="post" @submit.prevent="
+                                if (newDescription.trim() === '') return;
+                                fetch('/rename/{{ todo.id }}', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                    body: new URLSearchParams({ description: newDescription })
+                                }).then(() => {
+                                    editing = false;
+                                    location.reload();
+                                });
+                            ">
+                                <input type="text"
+                                       x-model="newDescription"
+                                       @keydown.escape.prevent="editing = false; newDescription = '{{ todo.description }}'"
+                                       x-ref="editInput"
+                                       class="text-lg w-full border-b-2 border-blue-500 focus:outline-none bg-transparent">
+                            </form>
+                        </div>
+                    </div>
+                    <div class="flex items-center ml-4 flex-shrink-0">
+                        <button @click="editing = !editing"
+                                class="text-sm font-semibold mr-4 w-14 text-center"
+                                :class="{ 'text-red-500 hover:text-red-700': editing, 'text-blue-500 hover:text-blue-700': !editing }">
+                            <span x-show="!editing">Rename</span>
+                            <span x-show="editing" x-cloak>Cancel</span>
+                        </button>
+                        <form action="/delete/{{ todo.id }}" method="post" class="m-0" x-show="!editing">
+                            <button type="submit" class="text-sm font-semibold text-red-500 hover:text-red-700">Delete</button>
+                        </form>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
