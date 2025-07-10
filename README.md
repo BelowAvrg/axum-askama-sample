@@ -6,7 +6,6 @@ This is a simple todo list application demonstrating the TAAA stack: Tailwind, A
 
 - Rust
 - Docker
-- PostgreSQL
 - `sqlx-cli` (`cargo install sqlx-cli`)
 
 ## Setup
@@ -29,13 +28,8 @@ This is a simple todo list application demonstrating the TAAA stack: Tailwind, A
     - Create the database:
 
       ```bash
-      sqlx database create
-      ```
-
-    - Run the migrations:
-
-      ```bash
-      sqlx migrate run
+      chmod +x ./scripts/init_db.sh
+      ./scripts/init_db.sh
       ```
 
 3.  **Run the application:**
@@ -45,19 +39,3 @@ This is a simple todo list application demonstrating the TAAA stack: Tailwind, A
     ```
 
     The application will be available at `http://localhost:3000`.
-
-## Docker
-
-You can also run the application using Docker:
-
-1.  **Build the image:**
-
-    ```bash
-    docker build -t axum-askama-sample .
-    ```
-
-2.  **Run the container:**
-
-    ```bash
-    docker run -p 3000:3000 --env-file .env axum-askama-sample
-    ```

@@ -3,24 +3,21 @@ use crate::{
     error::AppError,
 };
 use askama::Template;
-use axum::extract::rejection::FormRejection;
+use axum::response::Html;
 use axum::{
-    async_trait,
-    extract::{FromRequest, Path, State},
-    http::Request,
+    extract::{Path, State},
     response::{IntoResponse, Redirect},
     routing::{get, post},
     Form, Router,
 };
-use serde::de::DeserializeOwned;
 use validator::Validate;
 
 pub fn create_router(database: Database) -> Router {
     Router::new()
         .route("/", get(index).post(add_todo))
-        .route("/toggle/:id", post(toggle_todo))
-        .route("/delete/:id", post(delete_todo))
-        .route("/rename/:id", post(rename_todo))
+        .route("/toggle/{id}", post(toggle_todo))
+        .route("/delete/{id}", post(delete_todo))
+        .route("/rename/{id}", post(rename_todo))
         .with_state(database)
 }
 
@@ -30,9 +27,10 @@ pub struct IndexTemplate {
     pub todos: Vec<Todo>,
 }
 
+#[axum::debug_handler]
 pub async fn index(State(database): State<Database>) -> Result<impl IntoResponse, AppError> {
     let todos = database.get_todos().await?;
-    Ok(IndexTemplate { todos })
+    Ok(Html(IndexTemplate { todos }.render()?))
 }
 
 #[derive(serde::Deserialize, Validate)]
@@ -41,10 +39,18 @@ pub struct NewTodo {
     pub description: String,
 }
 
+fn validate_form<T: Validate>(form: Form<T>) -> Result<T, AppError> {
+    let validated = form.0;
+    validated.validate()?;
+    Ok(validated)
+}
+
+#[axum::debug_handler]
 pub async fn add_todo(
     State(database): State<Database>,
-    ValidatedForm(new_todo): ValidatedForm<NewTodo>,
+    form: Form<NewTodo>,
 ) -> Result<impl IntoResponse, AppError> {
+    let new_todo = validate_form(form)?;
     database.add_todo(new_todo.description).await?;
     Ok(Redirect::to("/"))
 }
@@ -55,15 +61,18 @@ pub struct RenameTodo {
     pub description: String,
 }
 
+#[axum::debug_handler]
 pub async fn rename_todo(
     State(database): State<Database>,
     Path(id): Path<i32>,
-    ValidatedForm(todo): ValidatedForm<RenameTodo>,
+    form: Form<RenameTodo>,
 ) -> Result<impl IntoResponse, AppError> {
+    let todo = validate_form(form)?;
     database.rename_todo(id, todo.description).await?;
     Ok(Redirect::to("/"))
 }
 
+#[axum::debug_handler]
 pub async fn toggle_todo(
     State(database): State<Database>,
     Path(id): Path<i32>,
@@ -72,6 +81,7 @@ pub async fn toggle_todo(
     Ok(Redirect::to("/"))
 }
 
+#[axum::debug_handler]
 pub async fn delete_todo(
     State(database): State<Database>,
     Path(id): Path<i32>,
@@ -80,23 +90,3 @@ pub async fn delete_todo(
     Ok(Redirect::to("/"))
 }
 
-pub struct ValidatedForm<T>(pub T);
-
-#[async_trait]
-impl<T, S> FromRequest<S> for ValidatedForm<T>
-where
-    T: DeserializeOwned + Validate,
-    S: Send + Sync,
-    Form<T>: FromRequest<S, Rejection = FormRejection>,
-{
-    type Rejection = AppError;
-
-    async fn from_request(
-        req: Request<axum::body::Body>,
-        state: &S,
-    ) -> Result<Self, Self::Rejection> {
-        let Form(value) = Form::<T>::from_request(req, state).await?;
-        value.validate()?;
-        Ok(ValidatedForm(value))
-    }
-}

@@ -5,6 +5,7 @@ WORKDIR /usr/src/app
 COPY . .
 ENV SQLX_OFFLINE=true
 RUN cargo install --path .
+RUN ls -l /usr/local/cargo/bin/
 
 FROM alpine:3.19
 
