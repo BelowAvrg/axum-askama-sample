@@ -92,7 +92,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let app = create_router(database);
 
-    let listener = TcpListener::bind("0.0.0.0:3000").await?;
+    let listener = TcpListener::bind("0.0.0.0:3001").await?;
     debug!("listening on {}", listener.local_addr()?);
     axum::serve(listener, app).await?;
 
@@ -108,9 +108,9 @@ Routes
 pub fn create_router(database: Database) -> Router {
     Router::new()
         .route("/", get(index).post(add_todo))
-        .route("/toggle/:id", post(toggle_todo))
-        .route("/delete/:id", post(delete_todo))
-        .route("/rename/:id", post(rename_todo))
+        .route("/toggle/{id}", post(toggle_todo))
+        .route("/delete/{id}", post(delete_todo))
+        .route("/rename/{id}", post(rename_todo))
         .with_state(database)
 }
 ```

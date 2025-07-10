@@ -1,6 +1,6 @@
-# TAAA Stack Todo List
+# Axum-Askama Stack Todo List
 
-This is a simple todo list application demonstrating the TAAA stack: Tailwind, Alpine.js, Axum, and Askama.
+This is a simple todo list application demonstrating the value of Axum, Askama and Sqlx.
 
 ## Prerequisites
 

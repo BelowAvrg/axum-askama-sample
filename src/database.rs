@@ -1,5 +1,5 @@
 use crate::error::AppError;
-use sqlx::{postgres::PgPoolOptions, PgPool};
+use sqlx::{migrate, postgres::PgPoolOptions, PgPool};
 use std::env;
 
 #[derive(Clone)]
@@ -14,6 +14,7 @@ impl Database {
             .max_connections(5)
             .connect(&database_url)
             .await?;
+        migrate!("./migrations").run(&pool).await?;
         Ok(Self { pool })
     }
 
@@ -56,7 +57,7 @@ impl Database {
         )
         .execute(&self.pool)
         .await?;
-    
+
         Ok(())
     }
 }
