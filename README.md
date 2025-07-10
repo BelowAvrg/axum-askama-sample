@@ -22,7 +22,7 @@ This is a simple todo list application demonstrating the value of Axum, Askama a
     - Create a `.env` file with the following content:
 
       ```
-      DATABASE_URL=postgres://user:password@localhost/todos
+      DATABASE_URL=postgres://<your postgres user>:password@localhost/todos
       ```
 
     - Create the database:
