@@ -9,6 +9,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
+use validator::Validate;
 
 pub fn create_router(database: Database) -> Router {
     Router::new()
@@ -30,20 +31,23 @@ pub async fn index(State(database): State<Database>) -> Result<impl IntoResponse
     Ok(IndexTemplate { todos })
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, Validate)]
 pub struct NewTodo {
+    #[validate(length(min = 1, max = 25))]
     pub description: String,
 }
 pub async fn add_todo(
     State(database): State<Database>,
     Form(new_todo): Form<NewTodo>,
 ) -> Result<impl IntoResponse, AppError> {
+    new_todo.validate()?;
     database.add_todo(new_todo.description).await?;
     Ok(Redirect::to("/"))
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, Validate)]
 pub struct RenameTodo {
+    #[validate(length(min = 1, max = 25))]
     pub description: String,
 }
 
@@ -52,6 +56,7 @@ pub async fn rename_todo(
     Path(id): Path<i32>,
     Form(todo): Form<RenameTodo>,
 ) -> Result<impl IntoResponse, AppError> {
+    todo.validate()?;
     database.rename_todo(id, todo.description).await?;
     Ok(Redirect::to("/"))
 }
