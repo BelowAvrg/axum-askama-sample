@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "UPDATE todos SET done = NOT done WHERE id = $1",
+  "query": "UPDATE todos SET is_done = NOT is_done WHERE id = $1",
   "describe": {
     "columns": [],
     "parameters": {
@@ -10,5 +10,5 @@
     },
     "nullable": []
   },
-  "hash": "64cd259ff21307ecd0138e20c18cd1b3eba3bce1b254afb9da8b27e84111772a"
+  "hash": "822d2c5e151ed5f43d6ccb3c6c4869298fd79ea67ff595d8d28991ff3d9051c6"
 }

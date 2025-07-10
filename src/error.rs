@@ -1,10 +1,10 @@
+use axum::extract::rejection::FormRejection;
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
 use thiserror::Error;
 use validator::ValidationErrors;
-use axum::extract::rejection::FormRejection;
 
 #[derive(Error, Debug)]
 pub enum AppError {

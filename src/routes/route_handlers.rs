@@ -3,16 +3,15 @@ use crate::{
     error::AppError,
 };
 use askama::Template;
+use axum::extract::rejection::FormRejection;
 use axum::{
     async_trait,
     extract::{FromRequest, Path, State},
     http::Request,
     response::{IntoResponse, Redirect},
     routing::{get, post},
-    Form,
-    Router,
+    Form, Router,
 };
-use axum::extract::rejection::FormRejection;
 use serde::de::DeserializeOwned;
 use validator::Validate;
 
@@ -30,7 +29,7 @@ pub fn create_router(database: Database) -> Router {
 pub struct IndexTemplate {
     pub todos: Vec<Todo>,
 }
- 
+
 pub async fn index(State(database): State<Database>) -> Result<impl IntoResponse, AppError> {
     let todos = database.get_todos().await?;
     Ok(IndexTemplate { todos })
@@ -92,7 +91,10 @@ where
 {
     type Rejection = AppError;
 
-    async fn from_request(req: Request<axum::body::Body>, state: &S) -> Result<Self, Self::Rejection> {
+    async fn from_request(
+        req: Request<axum::body::Body>,
+        state: &S,
+    ) -> Result<Self, Self::Rejection> {
         let Form(value) = Form::<T>::from_request(req, state).await?;
         value.validate()?;
         Ok(ValidatedForm(value))

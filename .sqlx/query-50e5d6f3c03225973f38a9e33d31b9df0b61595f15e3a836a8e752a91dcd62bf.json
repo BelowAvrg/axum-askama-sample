@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id, description, done FROM todos ORDER BY id",
+  "query": "SELECT id, description, is_done FROM todos ORDER BY id",
   "describe": {
     "columns": [
       {
@@ -15,7 +15,7 @@
       },
       {
         "ordinal": 2,
-        "name": "done",
+        "name": "is_done",
         "type_info": "Bool"
       }
     ],
@@ -28,5 +28,5 @@
       false
     ]
   },
-  "hash": "2a9fdd3e9a4082aa4c5768b4acc7900ea0918ff3adad48ef170e2dff56c7f35e"
+  "hash": "50e5d6f3c03225973f38a9e33d31b9df0b61595f15e3a836a8e752a91dcd62bf"
 }

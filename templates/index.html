@@ -36,11 +36,11 @@
                 <li x-data="{ editing: false, newDescription: '{{ todo.description }}' }" x-init="$watch('editing', val => { if (val) $nextTick(() => $refs.editInput.focus()) })" class="flex items-center justify-between bg-gray-100 p-4 rounded-lg shadow-sm">
                     <div class="flex items-center flex-grow">
                         <form action="/toggle/{{ todo.id }}" method="post" class="m-0 mr-4">
-                            <input type="checkbox" {% if todo.done %} checked {% endif %} onchange="this.form.submit()" class="h-6 w-6 rounded border-gray-300 text-blue-500 focus:ring-blue-500">
+                            <input type="checkbox" {% if todo.is_done %} checked {% endif %} onchange="this.form.submit()" class="h-6 w-6 rounded border-gray-300 text-blue-500 focus:ring-blue-500">
                         </form>
                         
                         <div x-show="!editing" class="flex-grow" @click="editing = true">
-                            <span class="text-lg cursor-pointer {% if todo.done %} line-through text-gray-500 {% else %} text-gray-800 {% endif %}">
+                            <span class="text-lg cursor-pointer {% if todo.is_done %} line-through text-gray-500 {% else %} text-gray-800 {% endif %}">
                                 {{ todo.description }}
                             </span>
                         </div>

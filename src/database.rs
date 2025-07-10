@@ -18,16 +18,12 @@ impl Database {
     }
 
     pub async fn get_todos(&self) -> Result<Vec<Todo>, AppError> {
-        let todos = sqlx::query!("SELECT id, description, done FROM todos ORDER BY id")
-            .fetch_all(&self.pool)
-            .await?
-            .into_iter()
-            .map(|row| Todo {
-                id: row.id,
-                description: row.description,
-                done: row.done,
-            })
-            .collect();
+        let todos: Vec<Todo> = sqlx::query_as!(
+            Todo,
+            "SELECT id, description, is_done FROM todos ORDER BY id"
+        )
+        .fetch_all(&self.pool)
+        .await?;
         Ok(todos)
     }
 
@@ -39,7 +35,7 @@ impl Database {
     }
 
     pub async fn toggle_todo(&self, id: i32) -> Result<(), AppError> {
-        sqlx::query!("UPDATE todos SET done = NOT done WHERE id = $1", id)
+        sqlx::query!("UPDATE todos SET is_done = NOT is_done WHERE id = $1", id)
             .execute(&self.pool)
             .await?;
         Ok(())
@@ -60,13 +56,14 @@ impl Database {
         )
         .execute(&self.pool)
         .await?;
+    
         Ok(())
     }
 }
 
-#[derive(sqlx::FromRow, serde::Deserialize, Clone)]
+#[derive(sqlx::FromRow)]
 pub struct Todo {
     pub id: i32,
     pub description: String,
-    pub done: bool,
+    pub is_done: bool,
 }
