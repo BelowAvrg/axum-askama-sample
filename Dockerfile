@@ -6,10 +6,10 @@ COPY . .
 
 RUN cargo install --path .
 
-FROM debian:buster-slim
+FROM alpine:3.19
 
 COPY --from=builder /usr/local/cargo/bin/axum-askama-sample /usr/local/bin/axum-askama-sample
 
 EXPOSE 3000
 
-CMD ["axum-askama-sample"]
+CMD ["axum-askama-sample"]%
