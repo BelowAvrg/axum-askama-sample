@@ -3,7 +3,7 @@ use crate::{
     error::AppError,
 };
 use askama::Template;
-use axum::response::Html;
+use axum::{debug_handler, response::Html};
 use axum::{
     extract::{Path, State},
     response::{IntoResponse, Redirect},
@@ -27,7 +27,7 @@ pub struct IndexTemplate {
     pub todos: Vec<Todo>,
 }
 
-#[axum::debug_handler]
+#[debug_handler]
 pub async fn index(State(database): State<Database>) -> Result<impl IntoResponse, AppError> {
     let todos = database.get_todos().await?;
     Ok(Html(IndexTemplate { todos }.render()?))
@@ -45,7 +45,7 @@ fn validate_form<T: Validate>(form: Form<T>) -> Result<T, AppError> {
     Ok(validated)
 }
 
-#[axum::debug_handler]
+#[debug_handler]
 pub async fn add_todo(
     State(database): State<Database>,
     form: Form<NewTodo>,
@@ -61,7 +61,7 @@ pub struct RenameTodo {
     pub description: String,
 }
 
-#[axum::debug_handler]
+#[debug_handler]
 pub async fn rename_todo(
     State(database): State<Database>,
     Path(id): Path<i32>,
@@ -72,7 +72,7 @@ pub async fn rename_todo(
     Ok(Redirect::to("/"))
 }
 
-#[axum::debug_handler]
+#[debug_handler]
 pub async fn toggle_todo(
     State(database): State<Database>,
     Path(id): Path<i32>,
@@ -81,7 +81,7 @@ pub async fn toggle_todo(
     Ok(Redirect::to("/"))
 }
 
-#[axum::debug_handler]
+#[debug_handler]
 pub async fn delete_todo(
     State(database): State<Database>,
     Path(id): Path<i32>,

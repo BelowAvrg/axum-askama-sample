@@ -278,3 +278,9 @@ Bonus Tips!
 ``` bash
 cargo watch -x run
 ```
+
+- Compile the askama macros with higer optimization in dev
+``` toml
+[profile.dev.package.askama_derive]
+opt-level = 3
+```

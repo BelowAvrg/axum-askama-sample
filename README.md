@@ -38,4 +38,4 @@ This is a simple todo list application demonstrating the TAAA stack: Tailwind, A
     cargo run
     ```
 
-    The application will be available at `http://localhost:3000`.
+    The application will be available at `http://localhost:3001`.
