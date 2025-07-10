@@ -24,7 +24,7 @@ pub fn create_router(database: Database) -> Router {
 pub struct IndexTemplate {
     pub todos: Vec<Todo>,
 }
-
+ 
 pub async fn index(State(database): State<Database>) -> Result<impl IntoResponse, AppError> {
     let todos = database.get_todos().await?;
     Ok(IndexTemplate { todos })
