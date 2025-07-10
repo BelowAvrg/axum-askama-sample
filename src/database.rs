@@ -53,9 +53,13 @@ impl Database {
     }
 
     pub async fn rename_todo(&self, id: i32, description: String) -> Result<(), AppError> {
-        sqlx::query!("UPDATE todos SET description = $1 WHERE id = $2", description, id)
-            .execute(&self.pool)
-            .await?;
+        sqlx::query!(
+            "UPDATE todos SET description = $1 WHERE id = $2",
+            description,
+            id
+        )
+        .execute(&self.pool)
+        .await?;
         Ok(())
     }
 }

@@ -1,9 +1,9 @@
-FROM rust:1.78 as builder
+FROM rust:1.88 as builder
 
 WORKDIR /usr/src/app
 
 COPY . .
-
+ENV SQLX_OFFLINE=true
 RUN cargo install --path .
 
 FROM alpine:3.19
